@@ -1,0 +1,81 @@
+/* TGBrowser GIF Shrine Styles */
+
+.tg-gif-section .tg-gif-wrapper {
+  padding: 8px 16px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column; /* Stack input and image */
+  gap: 10px;
+}
+
+/* The new input bar area */
+.tg-gif-input-wrapper {
+  display: flex;
+  width: 100%;
+}
+
+.tg-gif-input {
+  width: 100%;
+  padding: 0 12px;
+  height: 32px; /* Compact but clickable */
+  border: 1px solid var(--border);
+  border-radius: 16px; /* Pill shape like the main omnibox */
+  font-size: 13px;
+  background: rgba(255, 255, 255, 0.5); /* Semi-transparent */
+  color: var(--text);
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+body.dark-mode .tg-gif-input {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.tg-gif-input:focus {
+  background: var(--toolbar-bg);
+  box-shadow: 0 0 0 2px var(--primary); /* Focus ring */
+  border-color: transparent;
+}
+
+.tg-gif-img {
+  width: 100%;
+  height: 150px; /* Fixed height for consistency */
+  object-fit: cover; /* Crops nicely */
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.tg-gif-img:hover {
+  transform: scale(1.02);
+  opacity: 0.95;
+}
+
+.tg-gif-controls {
+  padding: 0 16px 8px 16px; /* Adjusted padding */
+  display: flex;
+  gap: 8px;
+}
+
+.tg-gif-controls button {
+  flex: 1;
+  padding: 6px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.tg-gif-controls button:hover {
+  background: var(--item-hover);
+}
+
+/* dark mode extra sauce */
+body.dark-mode .tg-gif-img {
+  box-shadow: 0 8px 20px rgba(0,0,0,0.45);
+}

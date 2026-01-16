@@ -1,0 +1,238 @@
+/* Retro Minimal Mod CSS - Beta 5 Compatible */
+/* TGUID: com.tgmods.retro */
+
+:root.retro-mod-active {
+    /* Retro Minimal Color Scheme */
+    --bg: #0a0a12;
+    --toolbar-bg: #1a1a2e;
+    --border: #303050;
+    --text: #a0a0c0;
+    --text-light: #a0a0c0;
+    --primary: #00ffff;
+    --primary-hover: #00cccc;
+    --accent: #ff00ff;
+    --menu-bg: #1a1a2e;
+    --item-hover: rgba(0, 255, 255, 0.1);
+    --shadow: 0 1px 3px rgba(0, 255, 255, 0.1);
+    --blur-amount: 0px;
+    
+    /* Retro Font */
+    --font-stack: 'Courier New', Consolas, monospace;
+}
+
+/* Global Retro Styling */
+body.retro-mod-active {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-stack);
+    letter-spacing: 0.5px;
+    filter: none !important;
+}
+
+/* Simplified Toolbar - Beta 5 Compatible */
+body.retro-mod-active .toolbar {
+    background: var(--toolbar-bg);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 1px 0 var(--border);
+    height: 40px;
+    padding: 4px 8px;
+}
+
+/* Retro Buttons */
+body.retro-mod-active .toolbar button {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    width: 32px;
+    height: 32px;
+    color: var(--text);
+    opacity: 0.8;
+    transition: all 0.2s ease;
+}
+
+body.retro-mod-active .toolbar button:hover {
+    background: var(--item-hover);
+    border-color: var(--primary);
+    color: var(--primary);
+    opacity: 1;
+    transform: none;
+}
+
+/* Terminal-style Address Bar */
+body.retro-mod-active #address {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    color: var(--text);
+    font-family: var(--font-stack);
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    height: 30px;
+    padding: 0 12px;
+}
+
+body.retro-mod-active #address:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 1px var(--primary);
+    background: rgba(0, 0, 0, 0.5);
+}
+
+/* Minimal Menu */
+body.retro-mod-active .menu-content {
+    background: var(--menu-bg);
+    border: 1px solid var(--border);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+body.retro-mod-active .menu-header {
+    border-bottom: 1px solid var(--border);
+    color: var(--primary);
+    font-size: 14px;
+}
+
+body.retro-mod-active .menu-section {
+    border-bottom: 1px solid var(--border);
+}
+
+body.retro-mod-active .menu-label {
+    color: var(--primary);
+    opacity: 0.7;
+    font-size: 9px;
+}
+
+body.retro-mod-active .menu-item {
+    padding: 8px 12px;
+    font-size: 12px;
+}
+
+body.retro-mod-active .menu-input {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--font-stack);
+    font-size: 11px;
+}
+
+/* Retro Toggle Switches */
+body.retro-mod-active .toggle-switch .slider {
+    background-color: var(--border);
+}
+
+body.retro-mod-active .toggle-switch input:checked + .slider {
+    background-color: var(--primary);
+}
+
+/* Status Bar - Beta 5 Compatible */
+body.retro-mod-active .status-bar {
+    background: var(--toolbar-bg);
+    border-top: 1px solid var(--border);
+    font-size: 10px;
+    height: 20px;
+    backdrop-filter: none;
+}
+
+body.retro-mod-active .status-error {
+    color: var(--accent);
+    font-weight: bold;
+}
+
+/* Retro Home Screen Override - Respects Beta 5 Variables */
+body.retro-mod-active #tgHome {
+    background: var(--bg) !important;
+    background-image: none !important;
+}
+
+body.retro-mod-active .tg-home-content {
+    background: var(--menu-bg) !important;
+    border: 1px solid var(--primary) !important;
+    box-shadow: 0 0 20px var(--primary)40 !important;
+    backdrop-filter: none !important;
+    animation: float 6s ease-in-out infinite; /* Preserve original animation */
+}
+
+body.retro-mod-active .tg-home-title {
+    color: var(--primary) !important;
+    text-shadow: 0 0 10px var(--primary) !important;
+    font-family: var(--font-stack) !important;
+    letter-spacing: 2px !important;
+}
+
+body.retro-mod-active .tg-home-subtitle {
+    color: var(--text-light) !important;
+    font-family: var(--font-stack) !important;
+    font-size: 14px !important;
+    letter-spacing: 1px !important;
+}
+
+/* Plug Status Styling */
+body.retro-mod-active .plug-status {
+    color: var(--text-light);
+}
+
+body.retro-mod-active .plug-active .plug-dot {
+    background: var(--accent);
+    box-shadow: 0 0 5px var(--accent);
+}
+
+/* Minimal Scrollbars */
+body.retro-mod-active::-webkit-scrollbar {
+    width: 8px;
+}
+
+body.retro-mod-active::-webkit-scrollbar-track {
+    background: var(--toolbar-bg);
+}
+
+body.retro-mod-active::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 0;
+}
+
+body.retro-mod-active::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+}
+
+/* Retro Animations */
+@keyframes retro-pulse {
+    0%, 100% { opacity: 0.8; }
+    50% { opacity: 1; }
+}
+
+body.retro-mod-active button:hover svg {
+    animation: retro-pulse 1s infinite;
+}
+
+/* Retro Typography */
+body.retro-mod-active {
+    font-smooth: never;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Compatibility with TGRitual Modes */
+body.retro-mod-active.ritual-retro,
+body.retro-mod-active.ritual-matrix {
+    /* Override ritual modes when retro mod is active */
+    filter: none !important;
+}
+
+/* Security Status Styling */
+body.retro-mod-active #securityStatus {
+    color: var(--text-light);
+}
+
+/* Load Button in Menu */
+body.retro-mod-active #loadModBtn {
+    border: 1px solid var(--border);
+    background: rgba(0, 0, 0, 0.3);
+    color: var(--text);
+}
+
+body.retro-mod-active #loadModBtn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
