@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shaman's Workshop - Mods</title>
+    <title>Shaman's Workshop - TGPlugs</title>
     <style>
         * {
             margin: 0;
@@ -18,10 +18,7 @@
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            padding: 40px 20px;
         }
 
         body::before {
@@ -31,116 +28,230 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(0, 0, 0, 0.3);
             z-index: -1;
         }
 
         .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
             background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(7px);
-            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border-radius: 20px;
             border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 50px;
-            max-width: 500px;
-            width: 100%;
+            padding: 40px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            text-align: center;
         }
 
-        .error-code {
-            font-size: 8em;
-            font-weight: 900;
-            color: #ffffff;
-            text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
-            margin-bottom: 10px;
-            line-height: 1;
-        }
-
-        .error-image {
-            width: 150px;
-            height: 150px;
-            margin: 30px auto;
-            border-radius: 15px;
-            object-fit: cover;
+        .header img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
         h1 {
             color: #ffffff;
-            margin-bottom: 15px;
-            font-size: 2em;
-            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
         }
 
         .subtitle {
             color: #f0f0f0;
-            margin-bottom: 30px;
-            font-size: 1.1em;
-            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
-            line-height: 1.6;
+            font-size: 1.2em;
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
         }
 
-        .btn-container {
+        .plugins-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .plugin-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 30px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .plugin-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .plugin-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .plugin-name {
+            color: #ffffff;
+            font-size: 1.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
+        }
+
+        .plugin-description {
+            color: #f0f0f0;
+            font-size: 1em;
+            line-height: 1.6;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 15px;
+        }
+
+        .plugin-link {
+            display: inline-block;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 0.9em;
+            font-weight: 600;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-top: 10px;
+        }
+
+        .plugin-link:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .footer {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .footer-links {
             display: flex;
             gap: 15px;
             justify-content: center;
             flex-wrap: wrap;
-            margin-top: 30px;
+            margin-bottom: 20px;
         }
 
         .btn {
             display: inline-block;
             color: white;
             text-decoration: none;
-            padding: 15px 35px;
+            padding: 12px 30px;
             border-radius: 50px;
-            font-size: 1.1em;
+            font-size: 1em;
             font-weight: 600;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             transition: all 0.3s ease;
             border: 1px solid rgba(255, 255, 255, 0.2);
-            cursor: pointer;
         }
 
         .btn-home {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
 
-        .btn-home:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        .btn-github {
+            background: linear-gradient(135deg, #24292e 0%, #1a1d21 100%);
         }
 
-
-
-        .btn:active {
-            transform: translateY(-1px);
+        .btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
         }
 
         .footer-text {
-            margin-top: 40px;
             color: #e0e0e0;
             font-size: 0.9em;
             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
         }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+            
+            .plugins-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="container">        
-        <img src="columbina.png" alt="Insert Columbina image here lol" class="error-image">
-        
-        <h1>Bina is thinking...</h1>
-        <p class="subtitle">
-            Looks like you've visited the page dedicated for TGBrowser's TGPlugs!<br>
-            Sorry, this page isn't accessible in a certain way.
-        </p>
-
-        <div class="btn-container">
-            <a href="https://shamansworkshop.github.io" class="btn btn-home">Return to Workshop</a>
+    <div class="container">
+        <div class="header">
+            <img src="columbina.png" alt="Shaman's Workshop">
+            <h1>🔮 Shaman's TGPlugs Collection</h1>
+            <p class="subtitle">Enchanting plugins for your Telegram Browser experience</p>
         </div>
 
-        <p class="footer-text">Error 404 - Shaman's Workshop</p>
+        <div class="plugins-grid">
+            <div class="plugin-card">
+                <div class="plugin-icon">🎨</div>
+                <div class="plugin-name">DevKit</div>
+                <div class="plugin-description">
+                    A comprehensive development toolkit for building and testing TGPlugs with ease. Perfect for creators!
+                </div>
+                <a href="https://github.com/shamansworkshop/tgplugs/tree/main/DevKit" class="plugin-link">Explore DevKit →</a>
+            </div>
+
+            <div class="plugin-card">
+                <div class="plugin-icon">🎁</div>
+                <div class="plugin-name">GIFModLoader</div>
+                <div class="plugin-description">
+                    Load and manage custom GIF modifications for your Telegram Browser. Bring your chats to life with animated magic!
+                </div>
+                <a href="https://github.com/shamansworkshop/tgplugs/tree/main/GIFModLoader" class="plugin-link">Explore GIFModLoader →</a>
+            </div>
+
+            <div class="plugin-card">
+                <div class="plugin-icon">🎭</div>
+                <div class="plugin-name">RetroUI</div>
+                <div class="plugin-description">
+                    Transform your Telegram Browser interface with nostalgic retro themes. A blast from the past!
+                </div>
+                <a href="https://github.com/shamansworkshop/tgplugs/tree/main/RetroUI" class="plugin-link">Explore RetroUI →</a>
+            </div>
+
+            <div class="plugin-card">
+                <div class="plugin-icon">⏰</div>
+                <div class="plugin-name">SumTingWong</div>
+                <div class="plugin-description">
+                    When something's not quite right, SumTingWong helps you debug and troubleshoot your TGBrowser setup with humor and efficiency!
+                </div>
+                <a href="https://github.com/shamansworkshop/tgplugs/tree/main/SumTingWong" class="plugin-link">Explore SumTingWong →</a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="footer-links">
+                <a href="https://shamansworkshop.github.io" class="btn btn-home">🏠 Return to Workshop</a>
+                <a href="https://github.com/shamansworkshop/tgplugs" class="btn btn-github">💻 View on GitHub</a>
+            </div>
+            <p class="footer-text">Crafted with magic by Shaman's Workshop ✨</p>
+        </div>
     </div>
 </body>
 </html>
