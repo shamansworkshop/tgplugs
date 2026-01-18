@@ -1,0 +1,82 @@
+/* TGPlug: TGLite (TV/Low-Spec Mode)
+   ID: workshop.shaman.tglite
+   Description: Nukes visual effects for raw performance.
+*/
+
+/* --- THE NUCLEAR OPTION: DISABLE EXPENSIVE RENDERING --- */
+body, .toolbar, .menu-content, button, input {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    transition: none !important; /* No animations allowed */
+    filter: none !important;
+    animation: none !important;
+}
+
+/* Force Flat UI */
+:root {
+    --bg: #000000 !important;
+    --toolbar-bg: #1a1a1a !important;
+    --text: #ffffff !important;
+    --border: #444444 !important;
+    --primary: #00ffff !important; /* Cyan is high contrast */
+}
+
+body {
+    background: #000000 !important;
+    font-family: 'Courier New', monospace !important; /* Faster to render than web fonts */
+}
+
+/* Simplify the Toolbar for TV Remotes */
+.toolbar {
+    height: 60px !important; /* Bigger targets for TV cursor */
+    background: #111 !important;
+    border-bottom: 2px solid var(--primary) !important;
+    padding: 5px !important;
+}
+
+/* Big chunky inputs */
+#address {
+    background: #000 !important;
+    color: #fff !important;
+    border: 2px solid #555 !important;
+    font-size: 18px !important;
+    height: 40px !important;
+    border-radius: 0 !important; /* Radius is expensive on old rendering engines */
+}
+
+#address:focus {
+    border-color: var(--primary) !important;
+}
+
+/* Hide elements that are hard to use on TV */
+#tgHome, .tg-home-content, #menuBtn, .menu-content, #bookmarkBtn {
+    display: none !important; 
+}
+
+/* Status bar simplification */
+.status-bar {
+    background: #000 !important;
+    color: var(--primary) !important;
+    font-weight: bold;
+}
+
+/* Big Buttons */
+.tv-btn {
+    background: #333 !important;
+    color: white !important;
+    border: 1px solid white !important;
+    width: 50px !important;
+    height: 40px !important;
+    margin-right: 5px;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 0 !important;
+}
+
+.tv-btn:hover {
+    background: var(--primary) !important;
+    color: black !important;
+}
