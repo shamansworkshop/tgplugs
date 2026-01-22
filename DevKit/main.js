@@ -1,8 +1,7 @@
 /**
  * 🧙‍♂️ TGBrowser System Mod: Shaman's Developer Tools v3.2
  * TGUID: workshop.shaman.devkitui
- * Target: TGBrowser Beta 6 (HTML Line 558 Targeting)
- * Features: Restored v2.2 Monitor, Beta 6 Architecture, Sentinel Support
+ * Target: TGBrowser
  */
 
 (function() {
@@ -12,7 +11,7 @@
     const manifest = {
         tguid: "workshop.shaman.devkitui",
         name: "Shaman's DevKit",
-        version: "3.2-beta6", 
+        version: "3.2", 
         author: "Shaman's Workshop",
         type: "system_monitor",
         description: "Advanced system monitor with TGSentinel & Ritual integration"
@@ -48,7 +47,6 @@
 
     // 3. Host Identity (Targeting Line 558 of TGBrowser HTML)
     function detectHostIdentity() {
-        // Target: <div class="menu-header"> ... <span>v26.01.22 (Beta 6)</span> </div>
         // We target the second span within .menu-header specifically.
         const versionSpan = document.querySelector('.menu-header span:nth-of-type(2)');
         
