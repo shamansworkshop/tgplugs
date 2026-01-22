@@ -1,8 +1,8 @@
 /**
- * 🧙‍♂️ TGBrowser System Mod: Shaman's Developer Tools v2.2
- * TGUID: workshop.shaman.devtools
- * Target: TGBrowser Beta 5+
- * Features: Clean system monitor with real-time TGBrowser analytics
+ * 🧙‍♂️ TGBrowser System Mod: Shaman's Developer Tools v3.0
+ * TGUID: workshop.shaman.devkitui
+ * Target: TGBrowser (Auto-Detect)
+ * Features: Material You UI, Auto-Version Detection, TGMoLink v2 Support
  */
 
 (function() {
@@ -12,562 +12,492 @@
     const manifest = {
         tguid: "workshop.shaman.devkitui",
         name: "Shaman's DevKit",
-        version: "2.2",
+        version: "3.0", // Bumped for the major UI overhaul
         author: "Shaman's Workshop",
         type: "system_monitor",
-        description: "Clean system monitoring panel for TGBrowser"
+        description: "Material You system monitoring panel for TGBrowser"
     };
 
     // State tracking
     let devState = {
         activePlugs: [],
         browserFeatures: {},
-        lastUpdate: null
+        lastUpdate: null,
+        browserVersion: "Detecting..."
     };
 
-    // 2. Registration Ritual
+    // 2. Registration Ritual (TGMoLink v2 Compliant)
     function startPlug() {
         if (window.TGMoLink && window.TGMoLink.register) {
             const success = window.TGMoLink.register(manifest.tguid);
-            if (!success) return;
             
-            console.log(`✨ [${manifest.name}] Successfully registered - v${manifest.version}`);
-            
-            // Initialize after registration
-            setTimeout(() => {
-                initDevTools();
-                startMonitoring();
-            }, 100);
+            if (success) {
+                console.log(`✨ [${manifest.name}] Protocol Active - v${manifest.version}`);
+                // Initialize after registration to ensure safety
+                setTimeout(() => {
+                    detectBrowserVersion();
+                    initDevTools();
+                    startMonitoring();
+                }, 100);
+            } else {
+                console.error(`[${manifest.name}] Registration failed.`);
+            }
         } else {
-            setTimeout(startPlug, 50);
+            // Wait silently for the API
+            setTimeout(startPlug, 100);
         }
     }
 
-    // 3. Main Initialization
+    // 3. Environment Intelligence
+    function detectBrowserVersion() {
+        // 1. Try Global Object
+        if (window.TGBrowser && window.TGBrowser.version) {
+            devState.browserVersion = `TGBrowser v${window.TGBrowser.version}`;
+            return;
+        }
+
+        // 2. Try User Agent Parsing (Standard TGBrowser pattern)
+        const ua = navigator.userAgent;
+        const match = ua.match(/TGBrowser\/([\d.]+)/);
+        
+        if (match && match[1]) {
+            devState.browserVersion = `v${match[1]} (Stable)`;
+        } else {
+            // 3. Fallback based on feature detection
+            devState.browserVersion = "Unknown Build (Dev)";
+        }
+        console.log(`🕵️ [DevKit] Detected Environment: ${devState.browserVersion}`);
+    }
+
+    // 4. Main Initialization
     function initDevTools() {
+        ensureFonts(); // Make sure we have icons!
         injectDevUI();
         setupEventListeners();
         updateBrowserState();
         
-        console.log(`🛠️ [${manifest.name}] Monitoring ${manifest.tguid}`);
+        console.log(`🛠️ [${manifest.name}] UI Injection Complete`);
     }
 
-    // 4. Compact UI Injection
+    // Helper: Inject fonts if missing (Prevent broken icons)
+    function ensureFonts() {
+        if (!document.querySelector('link[href*="Material+Icons+Round"]')) {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = 'https://fonts.googleapis.com/icon?family=Material+Icons+Round';
+            document.head.appendChild(link);
+        }
+    }
+
+    // 5. Material You UI Injection
     function injectDevUI() {
-        // Clean previous injection if exists
         const oldUI = document.getElementById('shaman-dev-ui');
         if (oldUI) oldUI.remove();
         
-        // Style injection
         const style = document.createElement('style');
         style.textContent = `
+            :root {
+                --dk-sys-primary: #d0bcff;
+                --dk-sys-on-primary: #381e72;
+                --dk-sys-surface: rgba(20, 18, 24, 0.85);
+                --dk-sys-surface-variant: rgba(231, 224, 236, 0.1);
+                --dk-sys-outline: #938f99;
+                --dk-sys-success: #b6f2ba;
+                --dk-sys-error: #ffb4ab;
+            }
+
             .shaman-dev-overlay {
-                position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-                width: 380px; max-height: 70vh;
-                background: rgba(20, 20, 30, 0.98); backdrop-filter: blur(20px);
-                border: 2px solid var(--primary); border-radius: 14px;
-                color: #fff; z-index: 10000; padding: 0;
-                box-shadow: 0 0 30px rgba(var(--primary-rgb, 66, 133, 244), 0.3);
-                display: none; font-family: 'Segoe UI', 'Consolas', monospace;
+                position: fixed; 
+                top: 50%; left: 50%; 
+                transform: translate(-50%, -50%) scale(0.95);
+                opacity: 0;
+                width: 400px; 
+                max-height: 80vh;
+                background: var(--dk-sys-surface); 
+                backdrop-filter: blur(24px) saturate(180%);
+                border-radius: 28px;
+                color: #e6e1e5; 
+                z-index: 99999;
+                box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.1);
+                display: none; 
+                font-family: 'Roboto', 'Segoe UI', sans-serif;
                 overflow: hidden;
-                font-size: 12px;
+                transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.2, 0, 0, 1);
+            }
+
+            .shaman-dev-overlay.visible {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
             }
             
+            /* Header */
             .shaman-dev-header {
-                background: linear-gradient(135deg, var(--primary), #8a2be2);
-                color: #fff; padding: 12px 16px;
-                font-weight: 700; display: flex; justify-content: space-between;
-                align-items: center; font-size: 13px;
-                border-bottom: 1px solid rgba(255,255,255,0.1);
-            }
-            
-            .shaman-dev-body {
-                padding: 16px; max-height: 55vh; overflow-y: auto;
-            }
-            
-            .dev-section {
-                background: rgba(255,255,255,0.05);
-                border-radius: 8px; padding: 12px;
-                margin-bottom: 12px; border-left: 3px solid var(--primary);
-            }
-            
-            .dev-section-title {
-                color: #64b5f6; font-size: 11px; font-weight: 700;
-                text-transform: uppercase; letter-spacing: 1px;
-                margin-bottom: 8px; display: flex; align-items: center;
-                gap: 6px;
-            }
-            
-            .dev-section-title::before {
-                content: "▶"; font-size: 9px;
-            }
-            
-            .dev-grid {
-                display: grid; grid-template-columns: 1fr 1fr;
-                gap: 8px; font-size: 11px;
-            }
-            
-            .dev-item {
-                display: flex; justify-content: space-between;
-                padding: 5px 0; border-bottom: 1px dotted rgba(255,255,255,0.1);
-            }
-            
-            .dev-key {
-                color: #90caf9; font-weight: 600;
-            }
-            
-            .dev-val {
-                color: #81c784; font-weight: 500;
-            }
-            
-            .dev-val.active { color: #4caf50; }
-            .dev-val.inactive { color: #f44336; }
-            .dev-val.warning { color: #ff9800; }
-            .dev-val.info { color: #64b5f6; }
-            
-            .plug-list {
-                max-height: 100px; overflow-y: auto;
-                background: rgba(0,0,0,0.3); padding: 6px;
-                border-radius: 5px; margin-top: 5px;
-            }
-            
-            .plug-item {
-                font-family: 'Consolas', monospace; font-size: 10px;
-                padding: 3px 6px; margin: 2px 0;
-                background: rgba(100, 181, 246, 0.1);
-                border-radius: 3px; display: flex;
+                padding: 24px 24px 16px 24px;
+                display: flex; 
                 justify-content: space-between;
                 align-items: center;
             }
+
+            .header-title h2 {
+                margin: 0;
+                font-size: 22px;
+                font-weight: 400;
+                color: var(--dk-sys-primary);
+            }
             
-            .plug-id {
-                color: #bb86fc; overflow: hidden;
-                text-overflow: ellipsis; white-space: nowrap;
+            .header-subtitle {
+                font-size: 12px;
+                color: #cac4d0;
+                opacity: 0.8;
+                margin-top: 4px;
+                font-family: 'Roboto Mono', monospace;
+            }
+
+            .close-btn {
+                background: rgba(255,255,255,0.05);
+                border: none;
+                color: #e6e1e5;
+                width: 32px; height: 32px;
+                border-radius: 50%;
+                cursor: pointer;
+                display: flex; align-items: center; justify-content: center;
+                transition: background 0.2s;
+            }
+            .close-btn:hover { background: rgba(255,255,255,0.15); }
+            
+            /* Body */
+            .shaman-dev-body {
+                padding: 0 24px 24px 24px;
+                max-height: 60vh; 
+                overflow-y: auto;
+            }
+
+            /* Sections */
+            .dev-card {
+                background: var(--dk-sys-surface-variant);
+                border-radius: 16px;
+                padding: 16px;
+                margin-bottom: 16px;
+            }
+
+            .card-label {
+                font-size: 11px;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                color: var(--dk-sys-primary);
+                margin-bottom: 12px;
+                font-weight: 700;
+                display: flex; align-items: center; gap: 8px;
+            }
+
+            /* Data Grid */
+            .info-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 10px;
+                font-size: 13px;
+                padding-bottom: 8px;
+                border-bottom: 1px solid rgba(255,255,255,0.05);
+            }
+            .info-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+            .status-pill {
+                padding: 4px 12px;
+                border-radius: 100px;
+                font-size: 11px;
+                font-weight: 500;
+                background: rgba(255,255,255,0.1);
+            }
+            .status-pill.active { background: #003314; color: #b6f2ba; border: 1px solid #146c2e; }
+            .status-pill.inactive { background: #410e0b; color: #ffb4ab; border: 1px solid #8c1d18; }
+            .status-pill.info { background: #182856; color: #d0bcff; border: 1px solid #384f85; }
+
+            /* Plug List */
+            .plug-item {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 8px 0;
+            }
+            .plug-icon {
+                font-size: 18px;
+                color: var(--dk-sys-outline);
+            }
+            .plug-name {
+                font-family: 'Roboto Mono', monospace;
+                font-size: 12px;
+                color: #e6e1e5;
                 flex: 1;
             }
-            
-            .dev-buttons {
-                display: flex; gap: 8px; margin-top: 12px;
+
+            /* Actions */
+            .action-bar {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+                margin-top: 8px;
             }
-            
-            .dev-btn {
-                flex: 1; padding: 8px; border: none;
-                border-radius: 6px; cursor: pointer;
-                font-weight: 600; font-size: 11px;
-                transition: all 0.2s;
+
+            .btn {
+                border: none;
+                padding: 12px;
+                border-radius: 100px;
+                font-size: 13px;
+                font-weight: 500;
+                cursor: pointer;
+                display: flex; align-items: center; justify-content: center; gap: 8px;
+                transition: transform 0.1s;
             }
-            
-            .dev-btn-primary {
-                background: var(--primary); color: white;
+            .btn:active { transform: scale(0.98); }
+
+            .btn-tonal {
+                background: var(--dk-sys-primary);
+                color: var(--dk-sys-on-primary);
             }
-            
-            .dev-btn-secondary {
-                background: rgba(255,255,255,0.1); color: #fff;
+            .btn-text {
+                background: transparent;
+                color: var(--dk-sys-primary);
+                border: 1px solid rgba(208, 188, 255, 0.3);
             }
-            
-            .dev-btn:hover {
-                transform: translateY(-1px);
-                box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            }
-            
-            .timestamp {
-                font-size: 9px; color: #aaa;
-                text-align: right; margin-top: 10px;
-            }
-            
-            .no-data {
-                padding: 10px; text-align: center;
-                color: #aaa; font-size: 10px;
-                background: rgba(0,0,0,0.2);
-                border-radius: 5px; margin-top: 5px;
-            }
-            
-            .status-indicator {
-                display: inline-block; width: 7px; height: 7px;
-                border-radius: 50%; margin-right: 5px;
-            }
-            
-            .status-active { background: #4caf50; box-shadow: 0 0 4px #4caf50; }
-            .status-inactive { background: #f44336; }
-            
-            .sentinel-indicator {
-                display: inline-flex; align-items: center; gap: 4px;
-                font-size: 9px; padding: 2px 6px; border-radius: 10px;
-                background: rgba(0,0,0,0.2); margin-left: 4px;
-            }
+
+            /* Scrollbar */
+            .shaman-dev-body::-webkit-scrollbar { width: 4px; }
+            .shaman-dev-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
         `;
         document.head.appendChild(style);
 
-        // UI Overlay
         const ui = document.createElement('div');
         ui.id = 'shaman-dev-ui';
         ui.className = 'shaman-dev-overlay';
+        
         ui.innerHTML = `
             <div class="shaman-dev-header">
-                <span>⚡ DevKit v${manifest.version}</span>
-                <span style="cursor:pointer; font-size:18px" onclick="window.toggleDevUI()">×</span>
+                <div class="header-title">
+                    <h2>DevKit</h2>
+                    <div class="header-subtitle">${devState.browserVersion}</div>
+                </div>
+                <button class="close-btn" onclick="window.toggleDevUI()">
+                    <i class="material-icons-round" style="font-size: 20px;">close</i>
+                </button>
             </div>
+            
             <div class="shaman-dev-body">
-                <!-- TGBrowser Features Section -->
-                <div class="dev-section">
-                    <div class="dev-section-title">📊 TGBrowser State</div>
-                    <div class="dev-grid" id="dev-browser-features">
-                        <!-- Dynamic content -->
+                <div class="dev-card">
+                    <div class="card-label"><i class="material-icons-round" style="font-size:14px">memory</i> System State</div>
+                    <div id="dev-features-list">
+                        </div>
+                </div>
+                
+                <div class="dev-card">
+                    <div class="card-label">
+                        <i class="material-icons-round" style="font-size:14px">extension</i> 
+                        Active Mods (<span id="plug-count">0</span>)
+                    </div>
+                    <div id="dev-plug-list" style="max-height: 120px; overflow-y: auto;">
+                        <div style="text-align:center; padding:10px; opacity:0.5; font-size:12px;">No mods active</div>
                     </div>
                 </div>
                 
-                <!-- TGPlugs Section -->
-                <div class="dev-section">
-                    <div class="dev-section-title">🔌 Active TGPlugs (<span id="plug-count">0</span>)</div>
-                    <div class="plug-list" id="dev-plug-list">
-                        <div class="no-data">No TGPlugs active</div>
-                    </div>
-                </div>
-                
-                <!-- Action Buttons -->
-                <div class="dev-buttons">
-                    <button class="dev-btn dev-btn-secondary" onclick="window.refreshDevPanel()">
-                        🔄 Refresh
+                <div class="action-bar">
+                    <button class="btn btn-text" onclick="window.refreshDevPanel()">
+                        <i class="material-icons-round" style="font-size:18px">refresh</i> Refresh
                     </button>
-                    <button class="dev-btn dev-btn-primary" onclick="window.exportDevData()">
-                        📋 Copy Data to Clipboard
+                    <button class="btn btn-tonal" id="btn-export" onclick="window.exportDevData()">
+                        <i class="material-icons-round" style="font-size:18px">content_copy</i> Export
                     </button>
-                </div>
-                
-                <div class="timestamp" id="last-update">
-                    Last updated: --
                 </div>
             </div>
         `;
         document.body.appendChild(ui);
-
-        // Add to TGPanel menu
         injectMenuButton();
     }
 
-    // 5. Menu Integration
+    // 6. Menu Button (Subtle Integration)
     function injectMenuButton() {
+        // Wait for menu if it loads async
         const menuContent = document.querySelector('.menu-content');
         if (!menuContent) {
-            setTimeout(injectMenuButton, 100);
+            setTimeout(injectMenuButton, 500);
             return;
         }
 
-        // Remove existing button if present
-        const existingBtn = menuContent.querySelector('.devkit-menu-btn');
-        if (existingBtn) existingBtn.remove();
+        if (document.getElementById('dk-menu-trigger')) return;
 
-        // Create new menu item
-        const section = document.createElement('div');
-        section.className = 'menu-section';
-        section.innerHTML = `
-            <div class="menu-label">Developer Settings</div>
-            <div class="menu-item devkit-menu-btn" style="cursor:pointer">
-                <span>🔧 DevKit</span>
-                <span style="color:var(--primary); font-size:9px">v${manifest.version}</span>
-            </div>
+        const btn = document.createElement('div');
+        btn.id = 'dk-menu-trigger';
+        btn.style.cssText = `
+            padding: 12px 16px; margin: 4px 8px;
+            border-radius: 8px; cursor: pointer;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(var(--md-sys-color-primary-rgb, 11, 87, 208), 0.05);
         `;
-
-        // Insert before bookmarks section
-        const bookmarkSection = menuContent.querySelector('.menu-section:last-child');
-        if (bookmarkSection) {
-            menuContent.insertBefore(section, bookmarkSection);
-        } else {
-            menuContent.appendChild(section);
-        }
-
-        // Add click handler
-        const btn = section.querySelector('.devkit-menu-btn');
+        btn.innerHTML = `
+            <span style="font-size:14px; font-weight:500;">🔧 Developer Options</span>
+            <span style="font-size:10px; background:#e0e0e0; padding:2px 6px; border-radius:4px;">DEV</span>
+        `;
+        
         btn.onclick = () => {
             window.toggleDevUI();
-            menuContent.style.display = 'none';
+            // Close the main menu if possible
+            if(menuContent.parentElement.classList.contains('open')) {
+                // Assuming a standard toggle class
+            }
         };
+
+        // Insert at bottom of menu
+        menuContent.appendChild(btn);
     }
 
-    // 6. State Monitoring Functions
+    // 7. State Management
     function updateBrowserState() {
         devState.lastUpdate = new Date();
         
-        // Extract browser features from DOM
+        // Dynamic Feature Detection
         devState.browserFeatures = {
             nightMode: document.body.classList.contains('dark-mode'),
-            dataBarrier: document.getElementById('dataBarrierToggle')?.checked || false,
-            tgSentinel: document.getElementById('tgSentinelToggle')?.checked || false,
-            tgChroma: document.getElementById('chromaPicker')?.value || '#4285f4',
-            tgRitual: document.getElementById('ritualSelect')?.value || 'none',
-            tgHomeBackground: document.getElementById('wallpaperInput')?.value || 'none',
-            activePlugsCount: window.TGMoLink?.plugs?.length || 0
+            tgSentinel: !!document.getElementById('tgSentinelToggle')?.checked,
+            secureContext: window.isSecureContext,
+            screenSize: `${window.innerWidth}x${window.innerHeight}`
         };
         
-        // Get active plugs
+        // Get Plugs safely
         devState.activePlugs = window.TGMoLink?.plugs || [];
         
-        // Update UI
         renderDevPanel();
     }
 
-    // 7. UI Rendering
     function renderDevPanel() {
-        if (!document.getElementById('shaman-dev-ui')) return;
-        
-        // Update browser features with TGSentinel status included
-        const featuresContainer = document.getElementById('dev-browser-features');
-        featuresContainer.innerHTML = `
-            <div class="dev-item">
-                <span class="dev-key">🌙 Night Mode</span>
-                <span class="dev-val ${devState.browserFeatures.nightMode ? 'active' : 'inactive'}">
-                    ${devState.browserFeatures.nightMode ? 'ON' : 'OFF'}
+        const ui = document.getElementById('shaman-dev-ui');
+        if (!ui) return;
+
+        // Render Features
+        const fList = document.getElementById('dev-features-list');
+        fList.innerHTML = `
+            <div class="info-row">
+                <span>Night Mode</span>
+                <span class="status-pill ${devState.browserFeatures.nightMode ? 'active' : 'inactive'}">
+                    ${devState.browserFeatures.nightMode ? 'ENABLED' : 'DISABLED'}
                 </span>
             </div>
-            <div class="dev-item">
-                <span class="dev-key">🛡️ Data Barrier</span>
-                <span class="dev-val ${devState.browserFeatures.dataBarrier ? 'active' : 'inactive'}">
-                    ${devState.browserFeatures.dataBarrier ? 'ACTIVE' : 'INACTIVE'}
+            <div class="info-row">
+                <span>TGSentinel</span>
+                <span class="status-pill ${devState.browserFeatures.tgSentinel ? 'active' : 'inactive'}">
+                    ${devState.browserFeatures.tgSentinel ? 'ARMED' : 'DISARMED'}
                 </span>
             </div>
-            <div class="dev-item">
-                <span class="dev-key">🛡️ TGSentinel</span>
-                <span class="dev-val ${devState.browserFeatures.tgSentinel ? 'active' : 'inactive'}">
-                    ${devState.browserFeatures.tgSentinel ? 'ACTIVE' : 'INACTIVE'}
-                </span>
-            </div>
-            <div class="dev-item">
-                <span class="dev-key">🎨 TGChroma</span>
-                <span class="dev-val" style="color:${devState.browserFeatures.tgChroma}">
-                    ${devState.browserFeatures.tgChroma}
-                </span>
-            </div>
-            <div class="dev-item">
-                <span class="dev-key">🔮 TGRitual</span>
-                <span class="dev-val ${devState.browserFeatures.tgRitual !== 'none' ? 'active' : 'inactive'}">
-                    ${devState.browserFeatures.tgRitual.toUpperCase()}
+             <div class="info-row">
+                <span>Security Context</span>
+                <span class="status-pill ${devState.browserFeatures.secureContext ? 'active' : 'inactive'}">
+                    ${devState.browserFeatures.secureContext ? 'SECURE' : 'UNSAFE'}
                 </span>
             </div>
         `;
-        
-        // Update plug list
-        const plugList = document.getElementById('dev-plug-list');
-        const plugCount = document.getElementById('plug-count');
-        plugCount.textContent = devState.activePlugs.length;
-        
+
+        // Render Plugs
+        const pList = document.getElementById('dev-plug-list');
+        document.getElementById('plug-count').textContent = devState.activePlugs.length;
+
         if (devState.activePlugs.length > 0) {
-            plugList.innerHTML = devState.activePlugs.map(plug => `
+            pList.innerHTML = devState.activePlugs.map(tguid => `
                 <div class="plug-item">
-                    <span class="plug-id" title="${plug}">${plug}</span>
-                    <span style="color:#4caf50; font-size:8px">●</span>
+                    <i class="material-icons-round plug-icon">extension</i>
+                    <span class="plug-name">${tguid}</span>
+                    <i class="material-icons-round" style="color:#b6f2ba; font-size:12px;">check_circle</i>
                 </div>
             `).join('');
         } else {
-            plugList.innerHTML = '<div class="no-data">No TGPlugs active</div>';
+            pList.innerHTML = `<div style="text-align:center; padding:15px; opacity:0.6; font-size:12px;">No TGPlugs detected via TGMoLink.</div>`;
         }
-        
-        // Update timestamp
-        document.getElementById('last-update').textContent = 
-            `Last updated: ${devState.lastUpdate.toLocaleTimeString()}`;
     }
 
-    // 8. Event Listeners and Monitoring
     function setupEventListeners() {
-        // Monitor TGMoLink registration
-        const originalRegister = window.TGMoLink?.register;
-        if (originalRegister && !originalRegister.isHooked) {
-            // Mark as hooked
-            originalRegister.isHooked = true;
-            
-            const hookedRegister = function(...args) {
-                const result = originalRegister.apply(this, args);
-                if (result) {
-                    setTimeout(updateBrowserState, 50);
-                }
-                return result;
-            };
-            
-            // Copy properties
-            Object.assign(hookedRegister, originalRegister);
-            window.TGMoLink.register = hookedRegister;
-        }
-        
-        // Monitor toggle changes
-        ['darkModeToggle', 'dataBarrierToggle', 'tgSentinelToggle'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) {
-                el.addEventListener('change', updateBrowserState);
+        // Watch for DOM changes (Simulated Sentinel)
+        const observer = new MutationObserver((mutations) => {
+            if (document.getElementById('shaman-dev-ui').style.display !== 'none') {
+                updateBrowserState();
             }
         });
-        
-        // Monitor ritual select
-        const ritualSelect = document.getElementById('ritualSelect');
-        if (ritualSelect) {
-            ritualSelect.addEventListener('change', updateBrowserState);
-        }
+        observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
     }
 
     function startMonitoring() {
-        // Periodic updates every 5 seconds
-        setInterval(updateBrowserState, 5000);
-        
-        // Also update on visibility change
-        document.addEventListener('visibilitychange', () => {
-            if (!document.hidden) updateBrowserState();
-        });
-    }
-
-    // 9. Clipboard Copy Function
-    function copyToClipboard(text) {
-        return new Promise((resolve, reject) => {
-            // Try modern clipboard API first
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(text)
-                    .then(() => resolve(true))
-                    .catch(() => fallbackCopy(text) ? resolve(true) : reject(false));
-            } else {
-                fallbackCopy(text) ? resolve(true) : reject(false);
+        setInterval(() => {
+            if (document.getElementById('shaman-dev-ui').style.display !== 'none') {
+                updateBrowserState();
             }
-        });
+        }, 2000);
     }
 
-    function fallbackCopy(text) {
-        try {
-            const textArea = document.createElement('textarea');
-            textArea.value = text;
-            textArea.style.position = 'fixed';
-            textArea.style.left = '-999999px';
-            textArea.style.top = '-999999px';
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-            
-            const successful = document.execCommand('copy');
-            document.body.removeChild(textArea);
-            return successful;
-        } catch (err) {
-            console.error('Fallback copy failed:', err);
-            return false;
-        }
-    }
-
-    function showNotification(message, type = 'success') {
-        const notification = document.createElement('div');
-        notification.style.cssText = `
-            position: fixed; bottom: 20px; right: 20px;
-            background: ${type === 'error' ? '#f44336' : 'var(--primary)'}; 
-            color: white; padding: 10px 15px; border-radius: 8px;
-            font-size: 12px; font-weight: 600; z-index: 10001;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            animation: slideInUp 0.3s ease-out, fadeOut 0.3s ease-in 2.7s;
-            max-width: 250px; word-break: break-word;
-            border-left: 3px solid ${type === 'error' ? '#d32f2f' : '#1976d2'};
-        `;
-        notification.textContent = message;
-        notification.id = 'devkit-notification-' + Date.now();
-        
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-            if (notification.parentNode) {
-                notification.style.animation = 'slideOutDown 0.3s ease-in';
-                setTimeout(() => notification.remove(), 300);
-            }
-        }, 3000);
-    }
-
-    // 10. Global API Methods
+    // 8. Public API & Actions
     window.toggleDevUI = function() {
         const ui = document.getElementById('shaman-dev-ui');
         if (!ui) return;
         
         if (ui.style.display === 'block') {
-            ui.style.display = 'none';
+            ui.classList.remove('visible');
+            setTimeout(() => ui.style.display = 'none', 200);
         } else {
             ui.style.display = 'block';
+            // Slight delay to allow display:block to apply before opacity transition
+            setTimeout(() => ui.classList.add('visible'), 10);
             updateBrowserState();
         }
     };
 
     window.refreshDevPanel = function() {
         updateBrowserState();
-        const btn = document.querySelector('.dev-btn-secondary');
-        if (btn) {
-            btn.textContent = '🔄 Refreshing...';
-            setTimeout(() => btn.textContent = '🔄 Refresh', 500);
+        const btn = document.querySelector('.btn-text');
+        const icon = btn.querySelector('i');
+        icon.style.transition = 'transform 0.5s';
+        icon.style.transform = 'rotate(360deg)';
+        setTimeout(() => icon.style.transform = 'rotate(0deg)', 500);
+    };
+
+    window.exportDevData = function() {
+        const data = {
+            timestamp: new Date().toISOString(),
+            environment: devState.browserVersion,
+            state: devState.browserFeatures,
+            plugins: devState.activePlugs
+        };
+        
+        const json = JSON.stringify(data, null, 2);
+        
+        // Clipboard API with fallback
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(json).then(notifySuccess, notifyError);
+        } else {
+            // Fallback
+            const ta = document.createElement('textarea');
+            ta.value = json;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            notifySuccess();
         }
     };
 
-    window.exportDevData = async function() {
-        try {
-            const data = {
-                manifest: manifest,
-                state: devState,
-                timestamp: new Date().toISOString(),
-                browserInfo: {
-                    userAgent: navigator.userAgent,
-                    platform: navigator.platform,
-                    screen: `${screen.width}x${screen.height}`
-                }
-            };
-            
-            const jsonString = JSON.stringify(data, null, 2);
-            
-            const exportBtn = document.querySelector('.dev-btn-primary');
-            const originalText = exportBtn.textContent;
-            exportBtn.textContent = '📋 Copying...';
-            exportBtn.disabled = true;
-            
-            const success = await copyToClipboard(jsonString);
-            
-            if (success) {
-                showNotification('✅ Data copied to clipboard!', 'success');
-                console.log('📋 TGBrowser DevKit Data (copied to clipboard):\n', data);
-            } else {
-                throw new Error('Copy failed');
-            }
-            
-        } catch (error) {
-            console.error('Export failed:', error);
-            showNotification('❌ Failed to copy to clipboard!', 'error');
-        } finally {
-            const exportBtn = document.querySelector('.dev-btn-primary');
-            if (exportBtn) {
-                setTimeout(() => {
-                    exportBtn.textContent = '📋 Export Data';
-                    exportBtn.disabled = false;
-                }, 1000);
-            }
-        }
-    };
+    function notifySuccess() {
+        const btn = document.getElementById('btn-export');
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = `<i class="material-icons-round" style="font-size:18px">check</i> Copied!`;
+        btn.style.background = '#b6f2ba';
+        btn.style.color = '#00210e';
+        
+        setTimeout(() => {
+            btn.innerHTML = originalHTML;
+            btn.style.background = ''; // Revert to CSS var
+            btn.style.color = '';
+        }, 2000);
+    }
+    
+    function notifyError() {
+        alert("Could not copy data to clipboard. Check permissions.");
+    }
 
-    // 11. Expose DevKit API for other plugins
-    window.DevKitAPI = {
-        version: manifest.version,
-        getState: () => ({...devState}),
-        refresh: () => updateBrowserState(),
-        showPanel: () => window.toggleDevUI()
-    };
-
-    // 12. Initialize
+    // 9. Launch
     startPlug();
 
-    // 13. Add animation styles
-    const animationStyle = document.createElement('style');
-    animationStyle.textContent = `
-        @keyframes slideInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes slideOutDown {
-            from { opacity: 1; transform: translateY(0); }
-            to { opacity: 0; transform: translateY(20px); }
-        }
-        @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
-        }
-    `;
-    document.head.appendChild(animationStyle);
-
-    // 14. Log initialization
-    console.log(`%c🧙‍♂️ ${manifest.name} ${manifest.version} initialized`, 
-        'color: #64b5f6; font-weight: bold; font-size: 14px');
-    console.log(`%cTGUID: ${manifest.tguid}`, 'color: #81c784');
-    console.log('%c📊 System monitoring active', 'color: #4caf50');
 })();
